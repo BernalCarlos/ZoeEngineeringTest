@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Agent;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
@@ -49,8 +51,12 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'age' => ['required', 'numeric', 'max:120'],
+            'gender' => ['required', 'string', Rule::in(['M','F'])],
+            'zip_code' => ['required', 'string', 'size:5', 'exists:zip_codes,zip_code'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:agents'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ]);
     }
@@ -59,12 +65,16 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return \App\Models\Agent
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
+        return Agent::create([
+            'first_name' => $data['first_name'],
+            'last_name' => $data['last_name'],
+            'age' => $data['age'],
+            'gender' => $data['gender'],
+            'zip_code' => $data['zip_code'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
