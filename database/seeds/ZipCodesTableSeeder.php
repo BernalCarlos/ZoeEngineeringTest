@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Seeder;
-
 use Illuminate\Support\Facades\DB;
 
 class ZipCodesTableSeeder extends Seeder
@@ -16,7 +15,7 @@ class ZipCodesTableSeeder extends Seeder
         $fileHandler = fopen(database_path('seeds/data-files/2018_ZipCodes_Gaz_zcta_national.csv'), 'r');
 
         while(($zipCodeData = fgetcsv($fileHandler)) !== FALSE) {
-            DB::insert("insert into zip_codes (zip_code, latitude, longitude, geom) values (
+            DB::insert("INSERT INTO zip_codes (zip_code, latitude, longitude, geom) VALUES (
                         '{$zipCodeData[0]}',
                         {$zipCodeData[1]},
                         {$zipCodeData[2]},

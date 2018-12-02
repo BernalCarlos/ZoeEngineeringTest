@@ -14,11 +14,9 @@ class CreateZipCodesTable extends Migration
     public function up()
     {
         Schema::create('zip_codes', function (Blueprint $table) {
-            $table->string('zip_code');
+            $table->string('zip_code')->primary();
             $table->double('latitude');
             $table->double('longitude');
-
-            $table->primary('zip_code');
         });
 
         DB::statement('ALTER TABLE zip_codes ADD COLUMN geom geometry(Point) NOT NULL;');
