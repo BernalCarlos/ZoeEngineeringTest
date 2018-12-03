@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Matchers\AgentContactMatcher;
+use App\Matchers\ZipCodeDistanceMatcher;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->app->bind(AgentContactMatcher::class, ZipCodeDistanceMatcher::class);
     }
 
     /**
