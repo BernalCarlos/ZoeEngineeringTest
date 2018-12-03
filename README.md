@@ -1,69 +1,76 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+# Zoe engineering test by Carlos Bernal
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## Steps to setup a development environment
 
-## About Laravel
+1. Install [Laravel Homestead](https://laravel.com/docs/5.7/homestead).
+2. Clone the project.
+3. Edit the `Homestead.yml` file to add the site `zoe-financial.test`. The site should map to the `public` folder of the project.
+4. Edit the `Homestead.yml` file to add the database `zoe-financial`.
+5. Edit the `hosts` file to map the domain `zoe-financial.test` to the Homestead local ip.
+6. Copy to the contents of the `.env.example` file to a new `.env` file at the project root.
+7. Start the Homestead virtual machine (`vagrant up`).
+8. `SSH` into the Homestead virtual machine (`vagrant ssh`).
+9. Install the PostGIS extension.
+    ```bash
+    sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+    sudo apt-get update
+    sudo apt-get install postgis
+    ```
+10. `cd` to project root inside the Homestead virtual machine.
+11. Execute `composer install`
+12. Execute `php artisan migrate --seed`. The seeding process can take a while, be patient.
+13. Go to [http://zoe-financial.test](http://zoe-financial.test)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+## About the solution
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### The agent contact matcher
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications.
+The agent-contact match was based on the distance (in meters) between the zip codes of each user type.
 
-## Learning Laravel
+The system has a database table with all the U.S. zip codes and their corresponding latitude and longitude, which was obtained from the [United States Census Bureau](https://www.census.gov/geo/maps-data/data/gazetteer2018.html).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of any modern web application framework, making it a breeze to get started learning the framework.
+With the geographical information of each U.S. zip code, the system use the PostGIS PostgreSQL extension to find all the zip codes with in a certain radius ordered by distance, and then it matches such codes to all related contacts.
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 1100 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
+The matching solution uses the laravel service container to inject (bind) a matcher implementation. This way, the matching solution can be modified or changed in isolation. The classes of interest are:
 
-## Laravel Sponsors
+1. `App\Matchers\AgentContactMatcher`
+2. `App\Matchers\ZipCodeDistanceMatcher`
+3. `App\Providers\AppServiceProvider`
 
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell):
+### The UI and authentication logic
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
+For the sake of simplicity, all the UI and authentication logic was based on the Laravel default templates and behavior.
 
-## Contributing
+Here, the classes of interest are:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. `App\Http\Controllers\MatchesController`
+2. `App\Http\Controllers\UserDetailsController`
 
-## Security Vulnerabilities
+As it was asked, only the agents can register and login to the system, however the agents can't modify their information.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Data seed
 
-## License
+During the seeding process, a Contact is created for each possible zip code. This is done so that this assessment can be easily tested.  
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Unit testing
+
+The only class that was tested, was the one directly related to the solution of the problem.
+
+Tha class of interest is:
+
+1. `Tests\Unit\ZipCodeDistanceMatcherTest`
+
+### Things to improve
+
+If this project were to be deployed in to a real application, I would suggest the following improvements:
+
+1. Instead of a fixed list of zip codes geolocations, use a geolocation api. For example, [the google geolocation API](https://developers.google.com/maps/documentation/geolocation/intro).
+2. Completely separate the backend form the frontend and use an stateless api to communicate between them.
+3. Define a better matching algorithm.
+4. Create a new section for the Contacts. 
+5. Allow registered users to edit their information.
+6. Code testing coverage of at least 70%.
+
+
+
+  
