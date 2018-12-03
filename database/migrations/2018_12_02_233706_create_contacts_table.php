@@ -22,7 +22,6 @@ class CreateContactsTable extends Migration
             $table->string('zip_code')->index();
             $table->integer('profession_id')->index();
             $table->string('email')->unique();
-            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
 

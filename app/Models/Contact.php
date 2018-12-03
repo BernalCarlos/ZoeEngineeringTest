@@ -17,17 +17,12 @@ class Contact extends Model
         'age',
         'gender',
         'zip_code',
+        'profession_id',
         'email',
-        'password',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    public function profession()
+    {
+        return $this->hasOne(ContactProfession::class, 'id', 'profession_id');
+    }
 }

@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class ZipCodeDistanceMatcher implements AgentContactMatcher
 {
-    const DEFAULT_RADIUS = 30000;
-    
     /**
      * Returns a list of contacts that make a match with the supplied agent, based on the zip code distances.
      *

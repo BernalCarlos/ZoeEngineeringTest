@@ -5,6 +5,8 @@ use App\Models\Agent;
 
 interface AgentContactMatcher
 {
+    const DEFAULT_RADIUS = 30000;
+
     /**
      * Returns a list of contacts that make a match with the supplied agent, based on the matcher implementation.
      *
