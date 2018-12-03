@@ -18,3 +18,4 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/matches', 'MatchesController@index')->name('matches');
+Route::get('/user-details', 'UserDetailsController@index')->name('user-details');
